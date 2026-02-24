@@ -1,0 +1,100 @@
+Regras do Dose Certa que combinamos
+1- Conta / Auth (sem multiperfil)
+
+1 conta = 1 perfil (accountId = auth.users.id).
+
+/auth/bootstrap garante a linha em Account.
+
+/me retorna dados da conta logada.
+
+2- Datas e timezone
+
+Date no contrato = "YYYY-MM-DD" (interpretação no calendário local do usuário).
+
+scheduledAt e takenAt = ISO timestamptz (UTC).
+
+Front manda x-tz-offset-minutes = new Date().getTimezoneOffset() em chamadas que dependem de dia local (schedule, intakes range, reports).
+
+3- Medication vs Intake
+
+Medication guarda a “agenda”:
+
+timesOfDay: ["HH:mm"]
+
+scheduleType: DAILY | WEEKDAYS | INTERVAL
+
+weekDays (ISO dow 1..7) ou intervalDays
+
+startDate e endDate
+
+Intake guarda o “status do tomar” por evento:
+
+chave lógica: (accountId, medicationId, scheduledAt)
+
+status: TAKEN | SKIPPED | MISSED
+
+takenAt só quando TAKEN
+
+4- “Pendente” não é status
+
+Pendente = não existe Intake naquele evento (dia/horário).
+
+5- endDate e Archive
+
+endDate é inclusivo quando definido como “fim de tratamento” (se endDate == day, conta aquele dia).
+
+Archive virou regra diferente: parar agora.
+
+Implementação: archive seta endDate = ontem (pra sumir hoje mesmo) :\
+
+6- Medications list (active)
+
+active=true: startDate <= today e (endDate is null ou endDate >= today) (com endDate inclusivo).
+
+active=false: endDate < today.
+
+7- Editar horários
+
+PATCH /medications/:id com timesOfDay faz sync (delete + insert) pra ficar igual ao array.
+
+Isso não altera intakes passados (histórico fica intacto).
+
+Proteção: atualizar timesState só quando campos vierem !== undefined (pra não apagar sem querer).
+
+8- Schedule (Tela Hoje)
+
+/schedule/today gera itens do dia local:
+
+filtra meds ativos no dia local (startDate <= today e endDate null ou >= today)
+
+aplica regra occursOnLocalDate (DAILY/WEEKDAYS/INTERVAL)
+
+materializa scheduledAt via scheduledAtFromUserLocal(day, hhmm, offset)
+
+junta com Intake do dia (range UTC correspondente ao dia local)
+
+9- Reports (aderência)
+
+Report gera eventos esperados no calendário local (igual schedule).
+
+A gente achou melhor que o relatório conte o dia inteiro (inclusive horários futuros do dia atual), então:
+
+removeu a regra “não contar eventos futuros de hoje”.
+
+Sem intake conta como missed no report (pra aderência não ficar “0 eventos”).
+
+10- Snooze (adiar)
+
+Snooze é 100% local (notificação do Expo).
+
+Snooze não muda scheduledAt no backend.
+
+Se atravessar meia-noite: ainda registra o intake do evento original (ex.: dose de 23:50 “do dia anterior” tomada 00:05).
+
+Pra UX, a solução futura é ter “ver outros dias” (calendário/selector) — mas isso é front.
+
+11- Banco: MedicationTime não pode ter unique global em timeOfDay
+
+O índice correto é único por (medicationId, timeOfDay).
+
+Remove MedicationTime_timeOfDay_key e cria unique composto.

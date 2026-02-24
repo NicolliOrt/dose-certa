@@ -1,0 +1,1 @@
+export { AddMedicationScreen as AddMedication } from "./AddMedication/AddMedicationScreen";
