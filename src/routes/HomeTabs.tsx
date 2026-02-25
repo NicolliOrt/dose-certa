@@ -148,28 +148,36 @@ export function HomeTabs({ navigation }: any) {
         </View>
 
         <View style={styles.centerHeader}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoIcon}>⚗️</Text>
-          </View>
-          <Text style={styles.brandTitle}>Dose Certa</Text>
-          <Text style={styles.brandSubtitle}>Gerenciando: {userName}</Text>
+            <Text style={styles.brandTitle}>Dose Certa</Text>
+            <Text style={styles.brandSubtitle} numberOfLines={1}>
+                Gerenciando: {userName}
+            </Text>
         </View>
 
         <Tab.Navigator
-          initialRouteName="Today"
-          screenOptions={{
-            swipeEnabled: true,
-            tabBarScrollEnabled: false,
-            tabBarStyle: styles.tabBar,
-            tabBarItemStyle: styles.tabItem,
-            tabBarLabelStyle: styles.tabLabel,
-            tabBarIndicatorStyle: styles.indicator,
-            tabBarActiveTintColor: "#111827",
-            tabBarInactiveTintColor: "#6B7280",
-            tabBarPressColor: "transparent",
-            tabBarBounces: Platform.OS === "ios",
-          }}
-        >
+  initialRouteName="Today"
+  screenOptions={{
+    swipeEnabled: true,
+    tabBarScrollEnabled: false,
+    tabBarStyle: styles.tabBar,
+    tabBarItemStyle: styles.tabItem,
+    tabBarIndicatorStyle: styles.indicator,
+    tabBarActiveTintColor: "#111827",
+    tabBarInactiveTintColor: "#6B7280",
+    tabBarPressColor: "transparent",
+    tabBarBounces: Platform.OS === "ios",
+    tabBarLabel: ({ color, children }) => (
+      <Text
+        style={[styles.tabLabel, { color }]}
+        numberOfLines={2}
+        adjustsFontSizeToFit
+        minimumFontScale={0.85}
+      >
+        {children}
+      </Text>
+    ),
+  }}
+>
           <Tab.Screen
             name="Today"
             component={Home}
@@ -207,11 +215,13 @@ const styles = StyleSheet.create({
   topLink: { color: "#111827", fontWeight: "700" },
 
   centerHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 14,
-    alignItems: "center",
-  },
+  paddingHorizontal: 16,
+  paddingTop: 6,
+  paddingBottom: 8,
+  alignItems: "center",
+},
+brandTitle: { fontSize: 16, fontWeight: "900", color: "#4F46E5" },
+brandSubtitle: { marginTop: 4, fontSize: 12, color: "#6B7280", fontWeight: "700" },
   logoCircle: {
     width: 72,
     height: 72,
@@ -223,8 +233,8 @@ const styles = StyleSheet.create({
   },
   logoIcon: { fontSize: 28, color: "#FFF" },
 
-  brandTitle: { fontSize: 18, fontWeight: "900", color: "#4F46E5" },
-  brandSubtitle: { marginTop: 6, fontSize: 13, color: "#6B7280", fontWeight: "700" },
+  //brandTitle: { fontSize: 18, fontWeight: "900", color: "#4F46E5" },
+  //brandSubtitle: { marginTop: 6, fontSize: 13, color: "#6B7280", fontWeight: "700" },
 
   tabBar: {
     marginHorizontal: 16,
@@ -235,7 +245,7 @@ const styles = StyleSheet.create({
     elevation: 0,
     shadowOpacity: 0,
   },
-  tabItem: { borderRadius: 12, minHeight: 38 },
-  tabLabel: { fontSize: 13, fontWeight: "700", textTransform: "none" },
+  tabItem: { borderRadius: 12, minHeight: 48, paddingHorizontal: 6 },
+  tabLabel: { fontSize: 12, fontWeight: "800", textTransform: "none", textAlign: "center" },
   indicator: { height: "100%", borderRadius: 12, backgroundColor: "#FFFFFF" },
 });

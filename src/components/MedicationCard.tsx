@@ -30,34 +30,30 @@ type Props = {
 };
 
 function StatusPill({ status }: { status: IntakeStatus | null }) {
-  if (status === "MISSED") {
-    return (
-      <View style={[styles.pill, styles.pillMissed]}>
-        <AlertTriangle size={16} color="#FFF" />
-        <Text style={styles.pillText}>Perdido</Text>
-      </View>
-    );
-  }
-  if (status === "TAKEN") {
-    return (
-      <View style={[styles.pill, styles.pillTaken]}>
-        <CheckCircle size={16} color="#FFF" />
-        <Text style={styles.pillText}>Tomado</Text>
-      </View>
-    );
-  }
-  if (status === "SKIPPED") {
-    return (
-      <View style={[styles.pill, styles.pillSkipped]}>
-        <XCircle size={16} color="#FFF" />
-        <Text style={styles.pillText}>Pulado</Text>
-      </View>
-    );
-  }
+  const label =
+    status === "MISSED" ? "Perdido" :
+    status === "TAKEN" ? "Tomado" :
+    status === "SKIPPED" ? "Pulado" :
+    "Pendente";
+
+  const Icon =
+    status === "MISSED" ? AlertTriangle :
+    status === "TAKEN" ? CheckCircle :
+    status === "SKIPPED" ? XCircle :
+    CheckCircle;
+
+  const pillStyle =
+    status === "MISSED" ? styles.pillMissed :
+    status === "TAKEN" ? styles.pillTaken :
+    status === "SKIPPED" ? styles.pillSkipped :
+    styles.pillPending;
+
   return (
-    <View style={[styles.pill, styles.pillPending]}>
-      <CheckCircle size={16} color="#FFF" />
-      <Text style={styles.pillText}>Pendente</Text>
+    <View style={[styles.pill, pillStyle]}>
+      <Icon size={16} color="#FFF" />
+      <Text style={styles.pillText} numberOfLines={1}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -143,7 +139,7 @@ export function MedicationCard({
                   onPress={onPressUndo}
                   disabled={!onPressUndo}
                 >
-                  <Text style={styles.btnText}>Desfazer</Text>
+                  <Text style={styles.btnText} numberOfLines={1}>Desfazer</Text>
                 </TouchableOpacity>
               </>
             ) : (
@@ -154,7 +150,7 @@ export function MedicationCard({
                   disabled={!onPressCheck}
                 >
                   <CheckCircle size={16} color="#FFF" />
-                  <Text style={styles.btnText}>Tomar</Text>
+                  <Text style={styles.btnText} numberOfLines={1}>Tomar</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -163,7 +159,7 @@ export function MedicationCard({
                   disabled={!onPressSkip}
                 >
                   <XCircle size={16} color="#FFF" />
-                  <Text style={styles.btnText}>Pular</Text>
+                  <Text style={styles.btnText} numberOfLines={1}>Pular</Text>
                 </TouchableOpacity>
 
                 {intakeStatus === "MISSED" ? (
@@ -175,7 +171,7 @@ export function MedicationCard({
                     disabled={!onPressSnooze}
                   >
                     <Bell size={16} color="#FFF" />
-                    <Text style={styles.btnText}>Adiar</Text>
+                    <Text style={styles.btnText} numberOfLines={1}>Adiar</Text>
                   </TouchableOpacity>
                 )}
               </>
@@ -230,16 +226,25 @@ const styles = StyleSheet.create({
   footer: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   deleteButton: { padding: 8, borderRadius: 8, backgroundColor: "#FEE2E2" },
 
-  actionsRow: { flexDirection: "row", gap: 10, alignItems: "center" },
+  actionsRow: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  gap: 10,
+  alignItems: "center",
+  justifyContent: "flex-end",
+},
 
   actionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    gap: 8,
-  },
+  flexDirection: "row",
+  alignItems: "center",
+  paddingVertical: 10,
+  paddingHorizontal: 12,
+  borderRadius: 12,
+  gap: 8,
+  flexGrow: 1,
+  minWidth: 120, // permite quebrar bonitinho em 2 linhas
+  justifyContent: "center",
+},
   btnTaken: { backgroundColor: "#4F46E5" },
   btnSkipped: { backgroundColor: "#F59E0B" },
   btnSnooze: { backgroundColor: "#6366F1" },
@@ -248,13 +253,16 @@ const styles = StyleSheet.create({
   btnText: { color: "#FFF", fontWeight: "800", fontSize: 13 },
 
   pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    gap: 8,
-  },
+  flexDirection: "row",
+  alignItems: "center",
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  borderRadius: 12,
+  gap: 8,
+  flexGrow: 1,
+  minWidth: 120,
+  justifyContent: "center",
+},
   pillPending: { backgroundColor: "#4F46E5" },
   pillTaken: { backgroundColor: "#10B981" },
   pillSkipped: { backgroundColor: "#F59E0B" },
