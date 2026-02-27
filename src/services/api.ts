@@ -9,12 +9,12 @@ function joinUrl(a: string, b: string) {
   return `${a.replace(/\/$/, "")}/${b.replace(/^\//, "")}`;
 }
 
-// ✅ Base da Edge Function "express"
+// Base da Edge Function "express"
 const RAW =
   process.env.EXPO_PUBLIC_API_BASE_URL?.trim() ||
   joinUrl(SUPABASE_URL_RAW, "/functions/v1/express");
 
-// ✅ seu contrato é /v1
+// contrato é /v1
 const API_BASE_URL = joinUrl(RAW, "/v1");
 
 export const api = axios.create({
@@ -23,7 +23,7 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
-    apikey: SUPABASE_ANON, // ✅ obrigatório no Supabase/Edge/REST
+    apikey: SUPABASE_ANON,
   },
 });
 

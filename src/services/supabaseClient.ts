@@ -9,10 +9,10 @@ const SUPABASE_ANON_KEY = (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "").trim
 
 export const SUPABASE_URL_RAW = SUPABASE_URL;
 
-// ✅ ISSO precisa ser a key COMPLETA (pra usar no header `apikey`)
+// ISSO precisa ser a key COMPLETA (pra usar no header `apikey`)
 export const SUPABASE_ANON = SUPABASE_ANON_KEY;
 
-// ✅ opcional: só pra debug sem vazar a key inteira
+// opcional: só pra debug sem vazar a key inteira
 export const SUPABASE_ANON_PREVIEW = SUPABASE_ANON_KEY
   ? `${SUPABASE_ANON_KEY.slice(0, 8)}...`
   : "";
@@ -23,7 +23,7 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   );
 }
 
-// ✅ storage compatível com web + mobile
+// storage compatível com web + mobile
 const storage =
   Platform.OS === "web"
     ? {
@@ -42,6 +42,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     storage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: Platform.OS === "web", // web true, mobile false
+    detectSessionInUrl: Platform.OS === "web", // web true, mobile false :)
   },
 });

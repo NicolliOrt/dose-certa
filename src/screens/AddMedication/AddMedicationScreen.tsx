@@ -18,7 +18,12 @@ import { DetailsSection } from "./sections/DetailsSection";
 import { DurationSection } from "./sections/DurationSection";
 import { ScheduleSection } from "./sections/ScheduleSection";
 
+import { useAuth } from "../../auth/AuthProvider";
+import { scheduleNext30DaysForMedication } from "../../services/reminderPlanner";
+
 export function AddMedicationScreen({ navigation }: any) {
+  const { userId } = useAuth();
+
   const [name, setName] = useState("");
   const [doctor, setDoctor] = useState("");
   const [notes, setNotes] = useState("");
@@ -118,12 +123,28 @@ export function AddMedicationScreen({ navigation }: any) {
     };
 
     try {
-      await doseApi.createMedication(payloadFinal);
-      navigation.goBack();
-    } catch (e) {
-      console.error("Erro ao salvar medicamento:", e);
-      Alert.alert("Erro", "Não foi possível salvar o medicamento.");
+  const created = await doseApi.createMedication(payloadFinal);
+
+  const createdId = (created as any)?.id as string | undefined;
+
+  // agenda apenas o remédio recém-criado (pra não pesar)
+  // começa com 14 dias para estabilizar APK :) 30 nao da certo :(
+  const DAYS = 14;
+
+  if (userId && createdId) {
+    const meds = await doseApi.listMedications(true);
+    const full = meds.find((m) => m.id === createdId);
+
+    if (full) {
+      await scheduleNext30DaysForMedication({ userId, med: full, daysAhead: DAYS });
     }
+  }
+
+  navigation.goBack();
+} catch (e) {
+  console.error("Erro ao salvar medicamento:", e);
+  Alert.alert("Erro", "Não foi possível salvar o medicamento.");
+}
   }
 
   return (

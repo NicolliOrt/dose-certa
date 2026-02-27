@@ -22,6 +22,8 @@ import { AdherenceReportDTO } from "./reportTypes";
 import { addDays, diffDaysInclusive, formatBR, groupByLocalDay, pad2, statusLabel, statusPillBg, toLocalYMD } from "./utils";
 import { generateReportHtml } from "./PDF";
 
+import { useFocusEffect } from "@react-navigation/native";
+
 export function ReportsScreen() {
   const [startYMD, setStartYMD] = useState(() => {
     const d = addDays(new Date(), -7);
@@ -62,7 +64,7 @@ export function ReportsScreen() {
     setIsLoading(true);
     try {
       const [medList, intakeList, rep] = await Promise.all([
-        doseApi.listMedications(true),
+        doseApi.listMedications(),
         doseApi.getIntakes(s, e),
         doseApi.getAdherence(s, e),
       ]);
@@ -78,9 +80,11 @@ export function ReportsScreen() {
     }
   }, [startYMD, endYMD]);
 
-  React.useEffect(() => {
+ useFocusEffect(
+  useCallback(() => {
     load();
-  }, [load]);
+  }, [load])
+);
 
   const computed = useMemo(() => {
     const daysInRange = diffDaysInclusive(startYMD, endYMD);

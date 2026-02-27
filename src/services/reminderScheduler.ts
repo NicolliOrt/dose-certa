@@ -73,7 +73,7 @@ export async function cancelAllDoseRemindersForMedication(userId: string, medica
 }
 
 /**
- * Cancela TODOS os lembretes do usuário (use no logout).
+ * Cancela TODOS os lembretes do usuário (logout).
  */
 export async function cancelAllDoseRemindersForUser(userId: string) {
   const keys = await AsyncStorage.getAllKeys();
@@ -119,7 +119,7 @@ export async function scheduleDoseReminder(params: {
   // se já passou, não agenda
   if (params.triggerAt.getTime() <= Date.now() + 1000) return;
 
-  const id = await Notifications.scheduleNotificationAsync({
+  /*const id = await Notifications.scheduleNotificationAsync({
     content: {
       title: params.title,
       body: params.body,
@@ -130,7 +130,25 @@ export async function scheduleDoseReminder(params: {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
       date: params.triggerAt,
     },
-  });
+  });*/
+
+  const id = await Notifications.scheduleNotificationAsync({
+  content: {
+    title: params.title,
+    body: params.body,
+    sound: true,
+    ...(Platform.OS === "android"
+      ? {
+          channelId: "dose-reminders",
+          priority: Notifications.AndroidNotificationPriority.MAX,
+        }
+      : null),
+  },
+  trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: params.triggerAt,
+    },
+});
 
   await setStoredReminderId(params.userId, params.key, id);
 }

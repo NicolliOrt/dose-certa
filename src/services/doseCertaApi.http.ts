@@ -67,7 +67,6 @@ export const doseCertaApiHttp: DoseCertaApi = {
     const params = typeof active === "boolean" ? { active } : undefined;
 
     // final: /medications
-    // fallback (se vocês tinham algo diferente) mantém igual
     const { data } = await api.get<MedicationDTO[]>("/medications", { params });
     return data;
   },
@@ -120,7 +119,6 @@ export const doseCertaApiHttp: DoseCertaApi = {
   // ============ TODAY SCHEDULE + INTAKES ============
   async getTodaySchedule() {
     // final: GET /schedule/today
-    // fallback antigo (se existia): /schedule/today
     return getWithFallback<ScheduleItemDTO[]>(`/schedule/today`, `/schedule/today`);
   },
 
